@@ -1,9 +1,10 @@
 package mount
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"net/http"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/util"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 
@@ -70,7 +71,11 @@ func (wfs *WFS) CopyFileRange(cancel <-chan struct{}, in *fuse.CopyFileRangeIn) 
 		in.OffOut, in.OffOut+in.Len,
 	)
 
+	if in.Len == 0 {
+		return 0, fuse.OK
+	}
 	data := make([]byte, in.Len)
+
 	totalRead, err := readDataByFileHandle(data, fhIn, int64(in.OffIn))
 	if err != nil {
 		glog.Warningf("file handle read %s %d: %v", fhIn.FullPath(), totalRead, err)
